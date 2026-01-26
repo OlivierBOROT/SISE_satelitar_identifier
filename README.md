@@ -15,3 +15,5 @@ rayon de x km autour on prend des coordonnées aléatoires et on télécharge le
 
 
 prendre 50px en plus et couper les 50 px en bas pour enlever les labels
+
+raw (800x650) -> proc (800x600) -> test roboflow -> on verra bien
