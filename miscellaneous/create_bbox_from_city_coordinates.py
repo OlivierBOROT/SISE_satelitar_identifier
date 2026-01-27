@@ -1,7 +1,7 @@
 """Utily function to create a bounding box from city coordinates."""
 from pyproj import Transformer
 
-def create_bbox_from_cities_coordinates(
+def create_bbox_from_city_coordinates(
         lat: float,
         lon: float,
         width: float = 10,

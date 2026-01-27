@@ -1,7 +1,7 @@
 """Generates random coordinates within a specified bounding box."""
 import random
 
-def get_coords_in_bbox(
+def get_random_points_in_bbox(
         bbox: dict[str, float],
         number_of_points: int = 10
     ) -> list[dict[str, float]]:
@@ -25,6 +25,7 @@ def get_coords_in_bbox(
             for _ in range(number_of_points)
         ])
 
+    generate_points()
     # verify no duplicates
     while len(coords) != len(set(coords)):
         generate_points()
