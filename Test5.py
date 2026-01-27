@@ -5,7 +5,6 @@ import osmnx as ox
 import pandas as pd
 from pyproj import Transformer
 from shapely.geometry import MultiPolygon, Polygon, box
-from shapely.strtree import STRtree
 
 # =========================
 # PARAMÈTRES À MODIFIER

@@ -1,17 +1,22 @@
+"""Provides functionality to clean overlapping bounding boxes in a GeoDataFrame."""
 import geopandas as gpd
 import pandas as pd
 from shapely.geometry import MultiPolygon, Polygon
 
 def clean_overlapping_bboxes(
-    gdf, threshold=0.3, what_to_do_on_overlap="remove_smaller"
-):
+    gdf: gpd.GeoDataFrame,
+    threshold: float = 0.3,
+    what_to_do_on_overlap: str = "remove_smaller"
+) -> gpd.GeoDataFrame:
     """
     Provides functionality to clean overlapping bounding boxes in a GeoDataFrame.
 
     Args:
         gdf (gpd.GeoDataFrame): GeoDataFrame containing the bounding boxes.
         threshold (float, optional): Overlap threshold to consider. Defaults to 0.3.
-        what_to_do_on_overlap (str, optional): Action to take on overlap. Defaults to "remove_smaller". Options are "remove_smaller" or "merge".
+        what_to_do_on_overlap (str, optional): Action to take on overlap.
+        Defaults to "remove_smaller".
+        Options are "remove_smaller" or "merge".
 
     Raises:
         ValueError: If any geometry in the GeoDataFrame is not a Polygon or MultiPolygon.
@@ -42,9 +47,13 @@ def clean_overlapping_bboxes(
                     # remove the two old ones and add the new one
                     gdf = gdf[gdf.geometry != polygon]
                     gdf = gdf[gdf.geometry != other]
-                    gdf = pd.concat(
-                        [gdf, gpd.GeoDataFrame([{"geometry": new_polygon}])],
-                        ignore_index=True,
+                    gdf = gpd.GeoDataFrame(
+                        pd.concat(
+                            [gdf, gpd.GeoDataFrame([{"geometry": new_polygon}], crs=gdf.crs)],
+                            ignore_index=True,
+                        ),
+                        geometry="geometry",
+                        crs=gdf.crs,
                     )
 
     return gdf
