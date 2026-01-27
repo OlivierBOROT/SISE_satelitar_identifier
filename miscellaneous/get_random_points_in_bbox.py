@@ -27,7 +27,9 @@ def get_random_points_in_bbox(
 
     generate_points()
     # verify no duplicates
-    while len(coords) != len(set(coords)):
+    unique_coords = { (coord["lat"], coord["lon"]) for coord in coords }
+    while len(unique_coords) < number_of_points:
         generate_points()
+        unique_coords = { (coord["lat"], coord["lon"]) for coord in coords }
 
     return coords
