@@ -9,44 +9,6 @@
 { "type": "Feature", "properties": { "element": "way", "id": 279131441, "building": "house", "source": "cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2014", "category_of_building": "Maison" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 2.1859931, 48.8373278 ], [ 2.186063, 48.8372705 ], [ 2.1861827, 48.8373301 ], [ 2.1861128, 48.83739 ], [ 2.1859931, 48.8373278 ] ] ] } },
 { "type": "Feature", "properties": { "element": "way", "id": 279131442, "building": "house", "source": "cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2014", "category_of_building": "Maison" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 2.1862193, 48.8374486 ], [ 2.1862874, 48.8373881 ], [ 2.1864044, 48.8374498 ], [ 2.1863382, 48.837509 ], [ 2.1862193, 48.8374486 ] ] ] } },
 { "type": "Feature", "properties": { "element": "way", "id": 279131443, "building": "house", "source": "cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2014", "category_of_building": "Maison" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 2.1864405, 48.837565 ], [ 2.1865097, 48.8375063 ], [ 2.1866319, 48.8375679 ], [ 2.1865609, 48.8376278 ], [ 2.1864405, 48.837565 ] ] ] } },
-{ "type": "Feature", "properties": { "element": "way", "id": 279131445, "building": "house", "source": "cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2014", "category_of_building": "Maison" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 2.1856743, 48.8371591 ], [ 2.1857236, 48.837114 ], [ 2.1857691, 48.8371369 ], [ 2.1857199, 48.8371818 ], [ 2.1856743, 48.8371591 ] ] ] } },
-  {
-  "type": "Feature",
-  "properties": {
-    "element": "way",
-    "id": 279131445,
-    "building": "house",
-    "source": "cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2014",
-    "category_of_building": "Maison"
-  },
-  "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-      [
-        [
-          2.1856743,
-          48.8371591
-        ],
-        [
-          2.1857236,
-          48.837114
-        ],
-        [
-          2.1857691,
-          48.8371369
-        ],
-        [
-          2.1857199,
-          48.8371818
-        ],
-        [
-          2.1856743,
-          48.8371591
-        ]
-      ]
-    ]
-  }
-}
-  
+{ "type": "Feature", "properties": { "element": "way", "id": 279131445, "building": "house", "source": "cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2014", "category_of_building": "Maison" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 2.1856743, 48.8371591 ], [ 2.1857236, 48.837114 ], [ 2.1857691, 48.8371369 ], [ 2.1857199, 48.8371818 ], [ 2.1856743, 48.8371591 ] ] ] } }
 ]
 }
