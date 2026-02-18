@@ -1,7 +1,4 @@
 .env
-data/*
 cache/
 __pycache__/
 *.pyc
-test/
-testing/

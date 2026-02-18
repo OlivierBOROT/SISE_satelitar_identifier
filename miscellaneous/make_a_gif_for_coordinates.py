@@ -11,7 +11,6 @@ from shapely.geometry import box
 from miscellaneous.ask_mapbox_for_image import ask_mapbox_for_image
 from miscellaneous.clean_overlapping_bboxes import clean_overlapping_bboxes
 from miscellaneous.create_bbox_from_coordinates import create_bbox_from_coordinates
-from miscellaneous.crop_image import crop_image
 
 
 def _get_font(size: int = 20) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
@@ -159,9 +158,7 @@ def make_a_gif_for_coordinates(
             print(f"Cached image saved to {cache_path}")
 
     # ---- 3. Crop the 30px watermark at the bottom ------------------------------
-    base_image = crop_image(
-        image, top=0, left=0, right=img_width, bottom=img_height - 30
-    )
+    base_image = image.crop(box=(0, 0, img_width, img_height - 30))
 
     frames: list[Image.Image] = []
 

@@ -37,7 +37,7 @@ def clean_overlapping_bboxes(
             raise ValueError("Geometry must be a Polygon or MultiPolygon")
 
     merged_indices: set[int] = set()
-    new_geometries: list[Polygon] = []
+    new_rows: list[dict] = []
 
     for idx_a in gdf.index:
         if idx_a in merged_indices:
@@ -70,17 +70,27 @@ def clean_overlapping_bboxes(
 
         if merge_target is not None:
             geom_b = gdf.loc[merge_target, "geometry"]
-            new_geometries.append(geom_a.union(geom_b).envelope)
+            merged_geom = geom_a.union(geom_b).envelope
+
+            # Keep metadata from the largest polygon
+            if geom_a.area >= geom_b.area:
+                larger_idx = idx_a
+            else:
+                larger_idx = merge_target
+
+            # Create new row with merged geometry and metadata from larger polygon
+            new_row = gdf.loc[larger_idx].to_dict()
+            new_row["geometry"] = merged_geom
+            new_rows.append(new_row)
+
             merged_indices.add(idx_a)
             merged_indices.add(merge_target)
         # else: polygon stays as-is (handled below)
 
     # Build result: keep un-merged polygons + add newly merged ones
     remaining = gdf.loc[~gdf.index.isin(merged_indices)]
-    if new_geometries:
-        merged_gdf = gpd.GeoDataFrame(
-            [{"geometry": g} for g in new_geometries], crs=gdf.crs
-        )
+    if new_rows:
+        merged_gdf = gpd.GeoDataFrame(new_rows, crs=gdf.crs)
         result = gpd.GeoDataFrame(
             pd.concat([remaining, merged_gdf], ignore_index=True),
             geometry="geometry",

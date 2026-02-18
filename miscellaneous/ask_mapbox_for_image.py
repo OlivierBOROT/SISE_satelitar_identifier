@@ -6,25 +6,20 @@ from PIL import Image
 
 
 def ask_mapbox_for_image(
-    output_file: Path,
     image_width_height: dict[str, int],
     mapbox_token: str,
     bounding_box: dict[str, float],
     request_timeout: int = 10,
+    output_file: Path | bool = False,
 ) -> Image.Image:
     """Ask Mapbox for a satellite image of a given bounding box.
 
     Args:
-        output_file (Path): Path to save the output image.
         image_width_height (dict[str, int]): Dictionary with keys 'width' and 'height' for image dimensions.
         mapbox_token (str): Mapbox access token.
-        west (float, optional): Western boundary of the bounding box. Defaults to None.
-        south (float, optional): Southern boundary of the bounding box. Defaults to None.
-        east (float, optional): Eastern boundary of the bounding box. Defaults to None.
-        north (float, optional): Northern boundary of the bounding box. Defaults to None.
-        bounding_box (dict[str, float]):
-        Dictionary containing bounding box coordinates.
-        request_timeout (int, optional): Timeout for the HTTP request in seconds. Defaults to 10.
+        bounding_box (dict[str, float]): Dictionary with keys 'west', 'south', 'east', 'north' for bounding box coordinates.
+        request_timeout (int, optional): Timeout for the Mapbox API request in seconds. Defaults to 10 seconds.
+        output_file (Path | bool, optional): Path to save the output image. If False, no file is saved. Defaults to False.
 
     Raises:
         ValueError: If bounding box coordinates are not provided.
@@ -48,10 +43,6 @@ def ask_mapbox_for_image(
     if None in [image_width, image_height]:
         raise ValueError("Image width and height must be provided.")
 
-    if not output_file:
-        output_file = Path.cwd() / "image_satellite.png"
-        print(f"No output file provided, image will be saved at {output_file}")
-
     img_url: str = (
         "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/"
         f"[{west},{south},{east},{north}]/{image_width}x{image_height}"
@@ -59,6 +50,7 @@ def ask_mapbox_for_image(
     )
 
     img = requests.get(img_url, timeout=request_timeout).content
-    image = Image.open(BytesIO(img))
-    image.save(output_file)
+    if output_file:
+        image = Image.open(BytesIO(img))
+        image.save(output_file)
     return image
