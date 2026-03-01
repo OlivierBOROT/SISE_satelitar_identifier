@@ -1,11 +1,10 @@
 from miscellaneous.ask_mapbox_for_image import ask_mapbox_for_image
 from miscellaneous.clean_overlapping_bboxes import clean_overlapping_bboxes
-from miscellaneous.create_bbox_from_city_coordinates import (
-    create_bbox_from_city_coordinates,
-)
+from miscellaneous.create_bbox_from_city_coordinates import create_bbox_from_city_coordinates
 from miscellaneous.create_bbox_from_coordinates import create_bbox_from_coordinates
 from miscellaneous.get_random_points_in_bbox import get_random_points_in_bbox
 from miscellaneous.make_a_gif_for_coordinates import make_a_gif_for_coordinates
+from miscellaneous.format_yolo_labels import format_yolo_labels
 
 __all__ = [
     "clean_overlapping_bboxes",
@@ -14,4 +13,5 @@ __all__ = [
     "get_random_points_in_bbox",
     "ask_mapbox_for_image",
     "make_a_gif_for_coordinates",
+    "format_yolo_labels"
 ]
