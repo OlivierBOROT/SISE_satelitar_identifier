@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 6
+names: ['ferme', 'immeuble', 'maison', 'piscine', 'usine', 'villa']
+
+roboflow:
+  workspace: marins-workspace
+  project: houses-ske66
+  version: 2
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/marins-workspace/houses-ske66/dataset/2
