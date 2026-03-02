@@ -1,0 +1,31 @@
+============================================================
+RÉSULTATS D'ÉVALUATION - à copier dans le rapport LaTeX
+============================================================
+
+Total images     : 144
+Total GT boxes   : 2461
+Total predictions: 1992
+
+─── Par classe ───
+Classe          TP    FP    FN    Prec  Recall      F1
+ferme           56    35    93   0.615   0.376   0.467
+immeuble       270   143   518   0.654   0.343   0.450
+maison         803   318   442   0.716   0.645   0.679
+piscine        144   171    49   0.457   0.746   0.567
+usine           19    22    50   0.463   0.275   0.345
+villa            9     2     8   0.818   0.529   0.643
+
+TOTAL         1301   691  1160   0.653   0.529   0.584
+
+mAP@0.5 (approx.) : 0.621
+
+─── LaTeX (copier-coller) ───
+\texttt{ferme} & 56 & 35 & 93 & 0.615 & 0.376 & 0.467 \\
+\texttt{immeuble} & 270 & 143 & 518 & 0.654 & 0.343 & 0.450 \\
+\texttt{maison} & 803 & 318 & 442 & 0.716 & 0.645 & 0.679 \\
+\texttt{piscine} & 144 & 171 & 49 & 0.457 & 0.746 & 0.567 \\
+\texttt{usine} & 19 & 22 & 50 & 0.463 & 0.275 & 0.345 \\
+\texttt{villa} & 9 & 2 & 8 & 0.818 & 0.529 & 0.643 \\
+\midrule
+\textbf{Total} & 1301 & 691 & 1160 & 0.653 & 0.529 & 0.584 \\
+\textbf{mAP@0.5} & \multicolumn{6}{c}{0.621} \\
