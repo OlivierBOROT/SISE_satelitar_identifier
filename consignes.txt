@@ -1,0 +1,29 @@
+Deep Learning for Computer Vision 2025/2026
+Date: 22/01/2026
+Projet
+L'objectif de ce projet est d'étudier une architecture de réseau neuronal profond existant de type CNN
+pour une tâche de vision par ordinateur, telle que la détection d'objets ou la segmentation d'images,
+sur un ensemble d’images sélectionné par vous. Cet ensemble d’images sera votre jeu de données qui
+doit être réparti entre jeux d’entraînement, validation et test.
+Pour valider ce projet, vous devez rendre deux notebook Jupyter. L’un de notebooks doit entraîner (ou
+adapter) un modèle de l’architecture que vous avez choisie sur votre jeu d'entraînement. L’autre
+notebook doit évaluer votre meilleur modèle sur le jeu de test. Vous devez également fournir un
+rapport qui décrit votre projet (format PDF), ainsi qu’une archive contenant l’ensemble d’images utilisé
+(annotations comprises). Dans le rapport de votre projet (maximum 10 pages), vous allez présenter
+l'architecture choisie, les hyperparamètres sélectionnés pour l’entraîner et leurs justifications, ainsi
+que les résultats des expériences que vous avez menés pour l’évaluer.
+Les résultats des expériences menées doivent couvrir, au moins, les points suivants :
+▪ Résultats quantitatifs du modèle après apprentissage par transfert (« finetuning ») en utilisant
+une métrique d’évaluation pertinente à la tâche choisie.
+▪ Résultats qualitatives (e.g., images de cas réussis, des erreurs courantes commises par votre
+modèle, etc.)
+Date de rendu : voir les dépôts de projet mis à votre disposition sur la plateforme Moodle.
+Dépôt du projet : tous les éléments du projet doivent être déposés sur la plateforme de cours Moodle.
+Exceptionnellement, vous pouvez rendre l’archive contenant votre ensemble d’images et les poids de
+votre modèle entraîné sur un service de partage de fichiers (sans date d’expiration), si et seulement si
+la taille de ces éléments dépasse la taille maximale de fichiers acceptée par la plateforme de cours(512
+Mo).
+Caractéristiques du jeu de données
+• Nombre de classes : 5-10
+• Nombre d’exemples per classe : 30
+• Minimum d’images : 150
