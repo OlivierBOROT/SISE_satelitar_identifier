@@ -10,7 +10,10 @@ Produit dans rapport/figures/ :
   - sample_grid.png         (grille 2x3 d'images du dataset)
 """
 
-import os, sys, collections
+import collections
+import os
+import sys
+
 import matplotlib
 
 matplotlib.use("Agg")
@@ -31,68 +34,148 @@ COLORS = ["#2ecc71", "#3498db", "#e74c3c", "#00bcd4", "#9b59b6", "#f39c12"]
 # ═══════════════════════════════════════════════════════
 # 1. COURBE DE PERTE (training loss)
 # ═══════════════════════════════════════════════════════
-epochs = list(range(1, 51))
-losses = [
-    6.4510,
-    5.4788,
-    5.4477,
-    5.0659,
-    4.7124,
-    4.7821,
-    4.8435,
-    4.5914,
-    4.8182,
-    4.5946,
-    4.1841,
-    4.2157,
-    4.0422,
-    4.1000,
-    3.9791,
-    4.1211,
-    4.0705,
-    3.7376,
-    3.8286,
-    3.6782,
-    3.4651,
-    3.2229,
-    3.2462,
-    3.5401,
-    3.3791,
-    3.1496,
-    2.8646,
-    2.9618,
-    2.8494,
-    2.7162,
-    2.7798,
-    2.7207,
-    2.5218,
-    2.4808,
-    2.3099,
-    2.2893,
-    2.2209,
-    2.2245,
-    2.0517,
-    1.9901,
-    2.0030,
-    1.9554,
-    1.8214,
-    1.8090,
-    1.7708,
-    1.7239,
-    1.7095,
-    1.6708,
-    1.6832,
-    1.6114,
-]
+
+# Try to load real history from notebook execution
+history_path = os.path.join(PROJECT_DIR, "notebooks", "training_history.json")
+if os.path.exists(history_path):
+    print(f"[INFO] Using training history from {history_path}")
+    import json
+
+    with open(history_path, "r") as f:
+        history = json.load(f)
+    if isinstance(history, dict) and "train_loss" in history:
+        losses = history["train_loss"]
+        val_losses = history.get("val_loss", [])
+        epochs = list(range(1, len(losses) + 1))
+    else:
+        print("[WARN] Invalid history format. Using fallback data.")
+        epochs = list(range(1, 51))
+        # Fallback values from original script
+        losses = [
+            6.4510,
+            5.4788,
+            5.4477,
+            5.0659,
+            4.7124,
+            4.7821,
+            4.8435,
+            4.5914,
+            4.8182,
+            4.5946,
+            4.1841,
+            4.2157,
+            4.0422,
+            4.1000,
+            3.9791,
+            4.1211,
+            4.0705,
+            3.7376,
+            3.8286,
+            3.6782,
+            3.4651,
+            3.2229,
+            3.2462,
+            3.5401,
+            3.3791,
+            3.1496,
+            2.8646,
+            2.9618,
+            2.8494,
+            2.7162,
+            2.7798,
+            2.7207,
+            2.5218,
+            2.4808,
+            2.3099,
+            2.2893,
+            2.2209,
+            2.2245,
+            2.0517,
+            1.9901,
+            2.0030,
+            1.9554,
+            1.8214,
+            1.8090,
+            1.7708,
+            1.7239,
+            1.7095,
+            1.6708,
+            1.6832,
+            1.6114,
+        ]
+        val_losses = []
+else:
+    print(f"[WARN] History file not found at {history_path}. Using fallback data.")
+    epochs = list(range(1, 51))
+    losses = [
+        6.4510,
+        5.4788,
+        5.4477,
+        5.0659,
+        4.7124,
+        4.7821,
+        4.8435,
+        4.5914,
+        4.8182,
+        4.5946,
+        4.1841,
+        4.2157,
+        4.0422,
+        4.1000,
+        3.9791,
+        4.1211,
+        4.0705,
+        3.7376,
+        3.8286,
+        3.6782,
+        3.4651,
+        3.2229,
+        3.2462,
+        3.5401,
+        3.3791,
+        3.1496,
+        2.8646,
+        2.9618,
+        2.8494,
+        2.7162,
+        2.7798,
+        2.7207,
+        2.5218,
+        2.4808,
+        2.3099,
+        2.2893,
+        2.2209,
+        2.2245,
+        2.0517,
+        1.9901,
+        2.0030,
+        1.9554,
+        1.8214,
+        1.8090,
+        1.7708,
+        1.7239,
+        1.7095,
+        1.6708,
+        1.6832,
+        1.6114,
+    ]
+    val_losses = []
+
 
 fig, ax = plt.subplots(figsize=(8, 4.5))
-ax.plot(epochs, losses, color="#e74c3c", linewidth=2)
+ax.plot(epochs, losses, color="#e74c3c", linewidth=2, label="Train Loss")
+if val_losses:
+    ax.plot(epochs, val_losses, color="#3498db", linewidth=2, label="Val Loss")
+    ax.fill_between(epochs, val_losses, alpha=0.1, color="#3498db")
+
 ax.fill_between(epochs, losses, alpha=0.15, color="#e74c3c")
 ax.set_xlabel("Époque", fontsize=12)
 ax.set_ylabel("Loss (moyenne par batch)", fontsize=12)
 ax.set_title("Évolution de la perte d'entraînement", fontsize=14)
-ax.set_xlim(1, 50)
+ax.set_xlim(1, len(epochs))
 ax.grid(True, alpha=0.3)
+if val_losses:
+    ax.legend()
 fig.tight_layout()
 fig.savefig(os.path.join(FIGURES_DIR, "loss_curve.png"), dpi=200)
 plt.close(fig)

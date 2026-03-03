@@ -26,6 +26,7 @@
 \usepackage{float}
 \usepackage{booktabs}
 \usepackage{array}
+\usepackage{tabularx}
 \usepackage{multirow}
 
 % ---- Code source ----
@@ -144,23 +145,28 @@ Le jeu de données a ensuite été importé dans \textbf{Roboflow} pour :
     \item appliquer une auto-orientation (strip EXIF).
 \end{itemize}
 
-\noindent\textbf{Remarque :} l'intégralité des 144 images a été exportée en un seul ensemble d'entraînement. Aucun découpage train/validation/test n'a été effectué lors de l'export Roboflow, ce qui constitue une limite méthodologique discutée en section~\ref{sec:discussion}.
+\noindent\textbf{Remarque :} l'intégralité des 144 images a été exportée en un seul dossier depuis Roboflow. Cependant, un découpage rigoureux a été implémenté dans le notebook d'entraînement (\texttt{Final\_01\_Training.ipynb}) :
+\begin{itemize}
+    \item \textbf{80\,\%} pour l'entraînement ($\sim$115 images) ;
+    \item \textbf{10\,\%} pour la validation pendant l'entraînement ($\sim$14 images) ;
+    \item \textbf{10\,\%} pour le test final, isolés dès le début et jamais vus par le modèle ($\sim$15 images).
+\end{itemize}
 
 \subsection{Statistiques du jeu de données}
 
 \begin{table}[H]
 \centering
-\begin{tabular}{lc}
-\toprule
-\textbf{Caractéristique} & \textbf{Valeur} \\
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}X r}
+	oprule
+	extbf{Caractéristique} & \textbf{Valeur} \\
 \midrule
 Nombre total d'images & 144 \\
 Résolution finale & $640 \times 640$ pixels \\
 Format d'annotation & YOLO v5 PyTorch \\
 Nombre de classes & 6 \\
-Total annotations & 2\,461 \\
+Total annotations & 2\\,461 \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \caption{Résumé du jeu de données.}
 \label{tab:dataset}
 \end{table}
@@ -178,7 +184,7 @@ Les six classes définies sont :
 
 \begin{table}[H]
 \centering
-\begin{tabular}{clc}
+\begin{tabularx}{\linewidth}{c >{\raggedright\arraybackslash}X X}
 \toprule
 \textbf{ID} & \textbf{Classe} & \textbf{Description} \\
 \midrule
@@ -189,7 +195,7 @@ Les six classes définies sont :
 4 & \texttt{usine} & Bâtiment industriel \\
 5 & \texttt{villa} & Villa / grande maison \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \caption{Classes du jeu de données.}
 \label{tab:classes}
 \end{table}
@@ -256,26 +262,26 @@ L'apprentissage par transfert s'effectue en trois étapes :
 
 \subsection{Hyperparamètres}
 
-Les hyperparamètres sont définis dans le fichier \texttt{hyp.scratch-low.yaml} et dans le code d'entraînement (notebook \texttt{02 - Training.ipynb}).
+Les hyperparamètres sont configurés directement dans le code d'entraînement (notebook \texttt{Final\_01\_Training.ipynb}).
 
 \begin{table}[H]
 \centering
-\begin{tabular}{lll}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X}
 \toprule
 \textbf{Hyperparamètre} & \textbf{Valeur} & \textbf{Justification} \\
 \midrule
 Optimiseur & SGD & Standard pour YOLOv5, bonne généralisation \\
 Taux d'apprentissage initial (\texttt{lr0}) & 0,01 & Valeur par défaut YOLOv5 \\
-$\eta_{\min}$ (scheduler) & 0 & Valeur minimale du LR (défaut CosineAnnealingLR) \\
 Momentum & 0,937 & Accélère la convergence \\
 Weight decay & $5 \times 10^{-4}$ & Régularisation L2 \\
 Batch size & 8 & Compromis mémoire / stabilité du gradient \\
-Nombre d'époques & 50 & Convergence observée (loss stabilisée) \\
-Scheduler & CosineAnnealingLR & Décroissance douce du learning rate \\
-$T_{\max}$ (scheduler) & 100 & Période complète du cosinus \\
+Nombre d'époques & 100 & La loss ne plateau pas à 50~ép. ; 100~ép. $\approx$~40~min \\
+Scheduler & One-cycle LR (LambdaLR) & Décroissance du LR en une phase \\
+\texttt{lrf} (taux final) & 0,01 & LR final~$= lr_0 \times lrf = 10^{-4}$ \\
+\texttt{fl\_gamma} (Focal Loss) & 1,5 & Focal Loss~[8] : réduit la contribution des exemples faciles \\
 Taille d'entrée & $640 \times 640$ & Standard YOLOv5 \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \caption{Hyperparamètres d'entraînement.}
 \label{tab:hyp}
 \end{table}
@@ -284,7 +290,7 @@ Taille d'entrée & $640 \times 640$ & Standard YOLOv5 \\
 
 \begin{table}[H]
 \centering
-\begin{tabular}{lll}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X}
 \toprule
 \textbf{Paramètre} & \textbf{Valeur} & \textbf{Rôle} \\
 \midrule
@@ -294,11 +300,12 @@ Taille d'entrée & $640 \times 640$ & Standard YOLOv5 \\
 \texttt{iou\_t} (seuil IoU entraînement) & 0,20 & Seuil pour l'assignation des ancres \\
 \texttt{mosaic} & 1,0 & Augmentation mosaïque (probabilité 100\,\%) \\
 \texttt{fliplr} & 0,5 & Flip horizontal (probabilité 50\,\%) \\
+\texttt{flipud} & 0,5 & Flip vertical (probabilité 50\,\%) \\
 \texttt{hsv\_h / hsv\_s / hsv\_v} & 0,015 / 0,7 / 0,4 & Perturbation couleur HSV \\
 \texttt{translate} & 0,1 & Translation aléatoire ($\pm$10\,\%) \\
 \texttt{scale} & 0,5 & Mise à l'échelle aléatoire ($\pm$50\,\%) \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \caption{Paramètres de perte et d'augmentation de données.}
 \label{tab:aug}
 \end{table}
@@ -321,9 +328,12 @@ YOLOv5 utilise une perte composée de trois termes, calculée par \texttt{Comput
 \begin{itemize}
     \item \textbf{Framework} : PyTorch + bibliothèque \texttt{yolov5} (v7.0.14).
     \item \textbf{Dataset custom} : classe \texttt{YoloDetectionDataset} chargeant les images \texttt{.jpg} et les labels \texttt{.txt} au format YOLO.
+    \item \textbf{Augmentation géométrique} : flip horizontal et vertical (probabilité 0,5 chacun), appliqués à l'entraînement. Pertinent car les images satellites n'ont pas d'orientation préférentielle.
+    \item \textbf{Rééquilibrage de classes} : \texttt{WeightedRandomSampler} tire les images contenant \texttt{usine} ou \texttt{villa} 4$\times$ plus souvent pour compenser le déséquilibre.
     \item \textbf{Collate function} : gestion des cibles de taille variable avec indexation par image dans le batch.
+    \item \textbf{Meilleur checkpoint} : val\_loss pour les 20 premières époques (warmup), puis mAP@0.5 (plus stable après convergence initiale).
     \item \textbf{Appareil} : GPU CUDA si disponible, sinon MPS (Apple Silicon), sinon CPU.
-    \item \textbf{Sauvegarde} : les poids du modèle entraîné sont sauvegardés dans \texttt{yolov5n\_custom.pt}.
+    \item \textbf{Sauvegarde} : les poids du meilleur modèle sont sauvegardés dans \texttt{yolov5n\_custom.pt}.
 \end{itemize}
 
 % =====================================================================
@@ -332,59 +342,42 @@ YOLOv5 utilise une perte composée de trois termes, calculée par \texttt{Comput
 
 \subsection{Résultats quantitatifs --- Courbe de perte}
 
-L'entraînement sur 50 époques montre une convergence régulière de la fonction de perte (figure~\ref{fig:loss}) :
+L'entraînement sur 100 époques montre une convergence régulière de la fonction de perte (figure~\ref{fig:loss}) :
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.85\textwidth]{loss_curve.png}
-\caption{Évolution de la perte d'entraînement sur 50 époques.}
+\caption{Évolution de la perte (train et validation) sur 100 époques.}
 \label{fig:loss}
 \end{figure}
 
-\begin{table}[H]
-\centering
-\begin{tabular}{cc|cc|cc}
-\toprule
-\textbf{Époque} & \textbf{Loss} & \textbf{Époque} & \textbf{Loss} & \textbf{Époque} & \textbf{Loss} \\
-\midrule
-1  & 6,4510 & 18 & 3,7376 & 35 & 2,3099 \\
-5  & 4,7124 & 20 & 3,6782 & 40 & 1,9901 \\
-10 & 4,5946 & 25 & 3,3791 & 45 & 1,7708 \\
-15 & 3,9791 & 30 & 2,7162 & 50 & 1,6114 \\
-\bottomrule
-\end{tabular}
-\caption{Évolution de la perte d'entraînement (moyennée par batch).}
-\label{tab:loss}
-\end{table}
-
-La perte diminue de \textbf{6,45} à l'époque~1 à \textbf{1,61} à l'époque~50, soit une réduction de 75\,\%. La convergence est régulière sans signe de divergence, ce qui valide le choix des hyperparamètres. On observe une décroissance particulièrement rapide entre les époques~1 et~15 (phase d'adaptation des couches finales), puis une décroissance plus lente et stable jusqu'à l'époque~50 (fine-tuning des couches profondes).
+La perte d'entraînement diminue de \textbf{1,76} à l'époque~1 à \textbf{0,36} à l'époque~100 ($-79\,\%$). La décroissance est rapide jusqu'à l'époque~20 (adaptation des couches finales au transfert learning), puis continue lentement. La perte de validation reste stable entre 0,85 et 1,06 à partir de l'époque~12, sans divergence, ce qui confirme l'absence de sur-apprentissage catastrophique sur les données de validation. Le meilleur checkpoint est sélectionné à l'époque~60, où le mAP@0.5 de validation atteint son maximum de \textbf{0,309}.
 
 \subsection{Résultats quantitatifs --- Métriques d'évaluation}
 
-En l'absence de jeu de test séparé, nous évaluons le modèle sur l'ensemble d'entraînement lui-même (144 images) avec un seuil IoU de 0,5 et un seuil de confiance de 0,25. Le tableau~\ref{tab:metrics} résume les performances par classe. \textbf{Ces métriques reflètent donc la capacité du modèle à restituer les données vues pendant l'entraînement et non sa capacité de généralisation}, ce qui constitue une limite importante de cette évaluation.
+Nous évaluons le modèle sur le \textbf{jeu de test} (10\,\% des données, $\sim$15 images isolées dès le début et jamais vues pendant l'entraînement) avec un seuil IoU de 0,5 et un seuil de confiance de 0,25. Le tableau~\ref{tab:metrics} résume les performances par classe.
 
 \begin{table}[H]
 \centering
-\begin{tabular}{lcccccc}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}X c c c c c c}
 \toprule
-\textbf{Classe} & \textbf{TP} & \textbf{FP} & \textbf{FN} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} \\
+\textbf{Classe} & \textbf{Labels} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{mAP@0.5} \\
 \midrule
-\texttt{ferme}    & 56  & 35  & 93  & 0,615 & 0,376 & 0,467 \\
-\texttt{immeuble} & 270 & 143 & 518 & 0,654 & 0,343 & 0,450 \\
-\texttt{maison}   & 803 & 318 & 442 & 0,716 & 0,645 & 0,679 \\
-\texttt{piscine}  & 144 & 171 & 49  & 0,457 & 0,746 & 0,567 \\
-\texttt{usine}    & 19  & 22  & 50  & 0,463 & 0,275 & 0,345 \\
-\texttt{villa}    & 9   & 2   & 8   & 0,818 & 0,529 & 0,643 \\
+\texttt{ferme}    & 6   & 0,333 & 0,167 & 0,222 & 0,194 \\
+\texttt{immeuble} & 174 & 0,229 & 0,144 & 0,177 & 0,162 \\
+\texttt{maison}   & 160 & 0,462 & 0,344 & 0,394 & 0,349 \\
+\texttt{piscine}  & 31  & 0,684 & 0,419 & 0,520 & 0,586 \\
+\texttt{usine}    & 8   & 0,000 & 0,000 & 0,000 & 0,000 \\
+\texttt{villa}    & 3   & 0,000 & 0,000 & 0,000 & 0,000 \\
 \midrule
-\textbf{Total}    & 1\,301 & 691 & 1\,160 & 0,653 & 0,529 & 0,584 \\
-\textbf{mAP@0.5}  & \multicolumn{6}{c}{\textbf{0,621}} \\
+\textbf{mAP@0.5 global} & & \multicolumn{4}{c}{\textbf{0,215}} \\
 \bottomrule
-\end{tabular}
-\caption{Precision, Recall et F1-score par classe (IoU $\geq$ 0,5, confiance $\geq$ 0,25).}
+\end{tabularx}
+\caption{Precision, Recall, F1 et mAP@0.5 par classe sur le jeu de test (IoU $\geq$ 0,5, confiance $\geq$ 0,25).}
 \label{tab:metrics}
 \end{table}
 
-Le modèle atteint un \textbf{mAP@0.5 de 0,621} et un \textbf{F1-score global de 0,584}. La classe \texttt{maison}, la plus représentée, obtient les meilleurs résultats (F1~=~0,679). Notons le cas intéressant de \texttt{villa} : malgré seulement 17 annotations dans le dataset, le modèle atteint une precision de 0,818, suggérant que les quelques exemples disponibles sont visuellement distinctifs. À l'inverse, \texttt{usine} (F1~=~0,345) et \texttt{immeuble} en recall (0,343) sont les points faibles, ce dernier souffrant d'un grand nombre de faux négatifs (518).
+Le modèle atteint un \textbf{mAP@0.5 de 0,215} sur le jeu de test. La classe \texttt{piscine} obtient les meilleurs résultats (F1~=~0,520, mAP~=~0,586), ce qui s'explique par sa couleur bleue caractéristique et visuellement distinctive dans l'imagerie satellite. La classe \texttt{maison}, malgré sa dominance dans le dataset, n'atteint qu'un F1 de 0,394, indiquant un surapprentissage partiel. Les classes \texttt{usine} et \texttt{villa} ne sont pas détectées (scores nuls), confirmant que leur très faible représentation ($<$70 et 17 annotations respectivement) est insuffisante pour que le modèle apprenne des caractéristiques généralisables, même avec sur-échantillonnage.
 
 La figure~\ref{fig:pr_class} illustre ces métriques sous forme de diagramme en barres.
 
@@ -410,7 +403,7 @@ La matrice de confusion confirme que les confusions les plus fréquentes se prod
 
 \subsection{Résultats qualitatifs --- Inférence}
 
-L'inférence est réalisée dans le notebook \texttt{03 - Testing\_model.ipynb} avec les paramètres suivants :
+L'inférence est réalisée dans le notebook \texttt{Plots\_for\_report.ipynb} avec les paramètres suivants :
 \begin{itemize}
     \item Seuil de confiance : \texttt{conf\_thres = 0.25}
     \item Seuil IoU (NMS) : \texttt{iou\_thres = 0.45}
@@ -418,7 +411,7 @@ L'inférence est réalisée dans le notebook \texttt{03 - Testing\_model.ipynb} 
 
 Le processus d'inférence comprend :
 \begin{enumerate}
-    \item \textbf{Redimensionnement} avec \emph{letterboxing} à $640 \times 640$ (padding gris 114).
+    \item \textbf{Redimensionnement} simple à $640 \times 640$ (étirement, \texttt{PIL.Image.resize}).
     \item \textbf{Propagation avant} dans le modèle en mode \texttt{eval()}.
     \item \textbf{Non-Maximum Suppression} (NMS) pour filtrer les détections redondantes.
     \item \textbf{Remise à l'échelle} des \emph{bounding boxes} vers les coordonnées de l'image originale.
@@ -485,20 +478,41 @@ Ce projet démontre la faisabilité d'un pipeline complet de détection d'objets
 \begin{itemize}
     \item \textbf{Taille du jeu de données} : 144 images est en deçà de l'idéal pour 6 classes. L'augmentation de données (mosaïque, flip, HSV) compense partiellement ce déficit.
     \item \textbf{Qualité des annotations} : les annotations automatiques OSM ne sont pas toujours précises. Un passage par Roboflow a permis une correction manuelle partielle.
-    \item \textbf{Absence de jeu de validation structuré} dans la boucle d'entraînement : la perte de validation n'est pas suivie explicitement, ce qui empêche de détecter un éventuel sur-apprentissage.
-    \item \textbf{Déséquilibre des classes} : avec 1\,245 annotations pour \texttt{maison} contre seulement 17 pour \texttt{villa} et 69 pour \texttt{usine}, le modèle est biaisé vers les classes majoritaires. Des techniques de rééquilibrage (sur-échantillonnage, perte focale) pourraient améliorer les performances sur les classes rares.
+    \item \textbf{Taille critique du jeu de test} : avec un split 80/10/10, le jeu de test ne contient qu'environ 15~images. Les métriques sont donc instables et peu représentatives --- une variation de 1 TP peut changer le F1 de plusieurs points de pourcentage.
+    \item \textbf{Surapprentissage} : le modèle mémorise une partie des données d'entraînement. La loss décroît régulièrement mais les performances sur données inconnues restent limitées (mAP~0,215), signe d'un dataset insuffisant pour 6~classes.
+    \item \textbf{Déséquilibre des classes} : avec 1\,245 annotations pour \texttt{maison} contre seulement 17 pour \texttt{villa} et 69 pour \texttt{usine}, les classes rares ne sont pas détectées malgré le sur-échantillonnage.
 \end{itemize}
 
-\subsection{Perspectives d'amélioration}
+\subsection{Bilan comparatif des approches}
 
-\begin{enumerate}
-    \item \textbf{Augmenter le volume de données} : le pipeline de collecte peut facilement être étendu à d'autres coordonnées ou pays.
-    \item \textbf{Ajouter un suivi de validation} : calcul du mAP@0.5 et mAP@0.5:0.95 sur un jeu de validation à chaque époque.
-    \item \textbf{Entraîner plus longtemps} : la perte continue de décroître à l'époque~50, suggérant qu'un entraînement plus long (100--200 époques) pourrait améliorer les performances.
-    \item \textbf{Augmentation de données avancée} : activer \texttt{mixup}, \texttt{copy\_paste}, ou utiliser des rotations pour mieux couvrir la variabilité géographique.
-    \item \textbf{Modèle plus grand} : tester YOLOv5s ou YOLOv5m si le jeu de données est élargi.
-    \item \textbf{Segmentation} : passer à YOLOv5-seg ou à un modèle de segmentation d'instance pour des contours plus précis.
-\end{enumerate}
+Deux configurations d'entraînement ont été évaluées sur le \textbf{même jeu de test} (15~images, jamais vues) afin de mesurer l'impact des modifications apportées.
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}X c c}
+\toprule
+\textbf{Configuration} & \textbf{mAP@0.5 (test)} & \textbf{Classes détectées} \\
+\midrule
+Baseline : 50~ép., BCE, shuffle & 0,070 & maison, piscine \\
+Amélioré : 100~ép., FL $\gamma$=1,5, sampler, flip & \textbf{0,215} & ferme, immeuble, maison, piscine \\
+\bottomrule
+\end{tabularx}
+\caption{Comparaison des deux configurations sur le jeu de test (IoU $\geq$ 0,5).}
+\label{tab:compare}
+\end{table}
+
+L'approche améliorée multiplie le mAP par 3 ($\times$3,1) par rapport à la baseline. Les modifications apportées --- Focal Loss~[8], WeightedRandomSampler et augmentation géométrique --- ont permis au modèle de détecter deux classes supplémentaires (\texttt{ferme} et \textbf{immeuble}) sur le jeu de test. Cependant, \texttt{usine} et \texttt{villa} restent indétectables (scores nuls), leurs trop faibles représentations dans le dataset (69 et 17 annotations) étant insuffisantes pour une généralisation, même avec sur-échantillonnage $\times$4.
+
+\noindent\textbf{Note sur l'évaluation.} Une évaluation erronée sur l'ensemble des 144~images (entraînement inclus) avait initialement donné un mAP apparent de 0,621, masquant le surapprentissage. Les chiffres ci-dessus (0,070 et 0,215) sont calculés \emph{exclusivement} sur les 15~images de test, jamais exposées à l'entraînement.
+
+\subsection{Autres pistes non implémentées}
+
+\begin{itemize}
+    \item \textbf{Augmenter le volume de données} : le pipeline Mapbox/OSM est extensible à d'autres coordonnées ou pays pour atteindre 400+ images.
+    \item \textbf{Modèle plus grand} : YOLOv5s (7~M params) ou YOLOv8n avec un dataset élargi.
+    \item \textbf{Recalcul des anchors} : \texttt{autoanchor} pourrait optimiser les anchors aux tailles des bâtiments satellitaires.
+    \item \textbf{Segmentation d'instance} : YOLOv5-seg permettrait des contours plus précis que les bounding boxes.
+\end{itemize}
 
 % =====================================================================
 \section{Conclusion}
@@ -506,7 +520,7 @@ Ce projet démontre la faisabilité d'un pipeline complet de détection d'objets
 
 Ce projet a permis de développer un système complet de détection de bâtiments sur imagerie satellitaire, couvrant la collecte automatisée de données, l'annotation, l'entraînement d'un modèle de détection d'objets par transfert d'apprentissage, et l'inférence.
 
-L'architecture YOLOv5 Nano, choisie pour sa légèreté et son efficacité, a montré une convergence satisfaisante lors de l'entraînement (loss passant de 6,45 à 1,61 en 50 époques). L'évaluation quantitative révèle un mAP@0.5 de \textbf{0,621} et un F1-score global de \textbf{0,584}, des résultats encourageants étant donné la taille réduite du dataset (144 images) et le fort déséquilibre entre classes. Le pipeline développé --- de la collecte Mapbox/OSM à l'inférence --- est entièrement reproductible et extensible, constituant une base solide pour de futures améliorations.
+L'architecture YOLOv5 Nano, entraînée sur 100 époques avec Focal Loss ($\gamma$=1,5), sur-échantillonnage des classes rares et augmentation géométrique, atteint un \textbf{mAP@0.5 de 0,215} sur le jeu de test (15 images non vues). Ce résultat reflète la difficulté intrinsèque du problème : 144 images pour 6 classes avec un déséquilibre extrême (17 annotations pour \texttt{villa} contre 1\,245 pour \texttt{maison}). Les améliorations apportées ont permis de tripler le mAP par rapport à la baseline (0,070), avec 4 classes détectées sur 6. Le pipeline développé --- de la collecte Mapbox/OSM à l'inférence --- est entièrement reproductible et extensible à de nouvelles zones géographiques, constituant une base solide pour de futures améliorations.
 
 % =====================================================================
 \section*{Références}
@@ -520,6 +534,7 @@ L'architecture YOLOv5 Nano, choisie pour sa légèreté et son efficacité, a mo
     \item Roboflow. \textit{Computer Vision Platform}. \url{https://roboflow.com}
     \item Lin, T.-Y. et al. (2014). \textit{Microsoft COCO: Common Objects in Context}. ECCV 2014.
     \item Zheng, Z. et al. (2020). \textit{Distance-IoU Loss: Faster and Better Learning for Bounding Box Regression}. AAAI 2020.
+    \item Lin, T.-Y. et al. (2017). \textit{Focal Loss for Dense Object Detection}. ICCV 2017 (RetinaNet).
 \end{enumerate}
 
 \end{document}
