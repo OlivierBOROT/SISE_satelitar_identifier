@@ -97,21 +97,6 @@ Bounding box (Lambert 93, 0.4m/px, 512×542)
 
 ---
 
-## Entraînement
-
-| Paramètre | Valeur |
-|-----------|--------|
-| Modèle | YOLOv5 Nano (1.9M params) |
-| Transfer Learning | Poids pré-entraînés COCO |
-| Époques | 50 |
-| Batch size | 8 |
-| Optimiseur | SGD (lr=0.01, momentum=0.937) |
-| Scheduler | CosineAnnealingLR |
-| Taille d'entrée | 640×640 |
-| Loss finale | 1.61 (depuis 6.45 à l'époque 1) |
-
----
-
 ## Installation
 
 ```bash
